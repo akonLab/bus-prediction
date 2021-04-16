@@ -1,5 +1,6 @@
 package restApi;
 
+import controllers.TimeController;
 import models.SomeMinutesPeriodBusData;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,12 +12,13 @@ public class RestApiController {
     private static final int CODE_SUCCESS = 100;
     private static final int AUTH_FAILURE = 102;
 
-//
-//    @GetMapping
-//    public BusDataResponse showAllBuses() {
-//        return new BusDataResponse( SUCCESS_STATUS, CODE_SUCCESS,busContr.getBusModelHashMap());
-//
-//    }
+    private TimeController timeController = new TimeController();
+
+    @GetMapping
+    public BusDataResponse showAllBuses() {
+        return new BusDataResponse(SUCCESS_STATUS, CODE_SUCCESS, timeController.getAllBusData());
+
+    }
 //
 //    @GetMapping("/bus")
 //    public BusDataResponse showOnlyOneBusByTSCode(@RequestParam(value = "busTSCode") String busTSCode, @RequestBody BusDataRequest request) {
@@ -29,5 +31,5 @@ public class RestApiController {
 //            response = new BusDataResponse(ERROR_STATUS, AUTH_FAILURE,"not found",null);
 //        }
 //        return response;
-    //}
+//    }
 }
