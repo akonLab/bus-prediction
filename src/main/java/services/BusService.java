@@ -8,13 +8,14 @@ import models.Coordinates;
 import java.util.ArrayList;
 
 public class BusService {
-    private final APIConn conn = new APIConn();
+    private  APIConn conn = new APIConn();
     private final ArrayList<BusModel> busModels = new ArrayList<>();
 
     public BusService() {
     }
 
     public ArrayList<BusModel> getBusModels() {
+
         for (JsonObject object : conn.sort(conn.showBusData())) {//O(n)
             busModels.add(new BusModel(
                     new Coordinates(
@@ -24,8 +25,9 @@ public class BusService {
         }
         return busModels;
     }
-
-    public Double getDistanceBetween(Coordinates first, Coordinates second) {
-        return Math.sqrt(Math.pow(first.getLatitude() - second.getLatitude(), 2) + Math.pow(first.getLongitude() - second.getLongitude(), 2));
+    public Coordinates getCurrentCoordinates(String tscode){
+         conn.sort(conn.showBusData()).
     }
+
+
 }

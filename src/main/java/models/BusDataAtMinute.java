@@ -4,13 +4,11 @@ public class BusDataAtMinute {
     private final String time;
     private final Double Longitude;
     private final Double Latitude;
-    private final Double distance;
 
-    public BusDataAtMinute(String time, Double longitude, Double latitude, Double distance) {
+    public BusDataAtMinute(String time, Double longitude, Double latitude ) {
         this.time = time;
         Longitude = longitude;
         Latitude = latitude;
-        this.distance = distance;
     }
 
     public String getTime() {
@@ -23,9 +21,5 @@ public class BusDataAtMinute {
 
     public Double getLatitude() {
         return Latitude;
-    }
-
-    public Double getDistance() {
-        return distance;
     }
 }

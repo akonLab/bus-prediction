@@ -4,6 +4,8 @@ import controllers.TimeController;
 import models.SomeMinutesPeriodBusData;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/get10min")
 public class RestApiController {
@@ -12,24 +14,16 @@ public class RestApiController {
     private static final int CODE_SUCCESS = 100;
     private static final int AUTH_FAILURE = 102;
 
-    private TimeController timeController = new TimeController();
-
+    private final TimeController timeController = new TimeController();
+    private List<SomeMinutesPeriodBusData> allBusData=null;
     @GetMapping
     public BusDataResponse showAllBuses() {
-        return new BusDataResponse(SUCCESS_STATUS, CODE_SUCCESS, timeController.getAllBusData());
+        if (allBusData==null){
+            allBusData=timeController.getAllBusData();
+
+        }
+        return new BusDataResponse(SUCCESS_STATUS, CODE_SUCCESS, allBusData);
 
     }
-//
-//    @GetMapping("/bus")
-//    public BusDataResponse showOnlyOneBusByTSCode(@RequestParam(value = "busTSCode") String busTSCode, @RequestBody BusDataRequest request) {
-//        final BusDataResponse response;
-//
-//        if (busContr.getBusModelHashMap().containsKey(busTSCode)) {
-//            SomeMinutesPeriodBusData currentBus=busContr.getBusModelHashMap().get(busTSCode);
-//            response = new BusDataResponse( SUCCESS_STATUS, CODE_SUCCESS,currentBus.getTsCode(),currentBus);
-//        } else {
-//            response = new BusDataResponse(ERROR_STATUS, AUTH_FAILURE,"not found",null);
-//        }
-//        return response;
-//    }
+
 }

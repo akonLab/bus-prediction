@@ -1,6 +1,7 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SomeMinutesPeriodBusData {
@@ -8,9 +9,10 @@ public class SomeMinutesPeriodBusData {
     private  List<BusDataAtMinute> busDataAtMinutes = new ArrayList<>();
 
     //constructor
-    public SomeMinutesPeriodBusData(String tsCode, List<BusDataAtMinute> busDataAtMinutes) {
+    public SomeMinutesPeriodBusData(String tsCode, List<BusDataAtMinute> newBusDataAtMinutes) {
         TsCode = tsCode;
-        this.busDataAtMinutes = busDataAtMinutes;
+        Collections.reverse(newBusDataAtMinutes);
+        busDataAtMinutes=newBusDataAtMinutes;
     }
 
     //getter

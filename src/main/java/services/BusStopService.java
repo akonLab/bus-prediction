@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BusStopService {
-    private final File file = new File("/Users/adaada/IdeaProjects/bus_java/src/com/company/bus-stop");
+    private final File file = new File("C:\\Users\\praktikant\\IdeaProjects\\bus-prediction\\src\\main\\java\\base\\bus-stop");
     private final ArrayList<BusStop> busStops = new ArrayList<>();
 
     //constructor

@@ -1,6 +1,7 @@
 package controllers;
 
 
+import example.Task;
 import models.BusDataAtMinute;
 import models.BusModel;
 import models.BusStop;
@@ -16,135 +17,80 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class TimeController {
-    private BusService busService;
-    private BusStopService busStopService;
+    private BusService busService = new BusService();
     private List<SomeMinutesPeriodBusData> allBusData = null;
-    private Queue<Double> tenMinDistanceList = null;
-//    private Calculator calculator = new Calculator();
     private List<BusDataAtMinute> busDataAtMinuteLis = null;
 
     public TimeController() {
-        busService = new BusService();
-        busStopService = new BusStopService();
     }
 
 
     public List<SomeMinutesPeriodBusData> getAllBusData() {
         if (allBusData == null) {
             allBusData = new ArrayList<>();
-//            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-//            scheduler.scheduleAtFixedRate(calculator, 0, 1, TimeUnit.MINUTES);
         }
 
-//        for (BusModel busModel : busService.getBusModels()) {
-//            for (BusStop busStop : busStopService.getBusStops()) {
-//                allBusData.add(new SomeMinutesPeriodBusData(
-//                        busModel.getTSCode(),
-//                        generate10MinList(busStop, busModel)
-//                ));
-//            }
+//        ArrayList<BusModel> busModels=busService.getBusModels();
+//        for (BusModel busModel : busModels) {
+////            if (allBusData.contains(busModel)){
+////
+////            }
+//            allBusData.add(new SomeMinutesPeriodBusData(
+//                    busModel.getTSCode(),
+//                    getTimePeriodList(  busModel)
+//            ));
+//
 //        }
+        busService = new BusService();
+        allBusData.add(
+                new SomeMinutesPeriodBusData(
+                busService.getBusModels().get(0).getTSCode(),
+                getTimePeriodList(busService.getBusModels().get(0))
+        ));
 
-        BusStop busStop = busStopService.getBusStops().get(0);
-        for (BusModel busModel : busService.getBusModels()) {
-            allBusData.add(new SomeMinutesPeriodBusData(
-                    busModel.getTSCode(),
-                    generate10MinList(busStop, busModel)
-            ));
-
-        }
         return allBusData;
     }
 
-    public List<BusDataAtMinute> generate10MinList(BusStop busStop, BusModel busModel) {
-
-        try {
-            if (busDataAtMinuteLis == null) {
-                busDataAtMinuteLis = new ArrayList<>();
-            }
-            if (busDataAtMinuteLis.size() >= 10) {
-                busDataAtMinuteLis.remove(busDataAtMinuteLis.size() - 1);
-            }
-        } catch (NullPointerException e) {
-            System.out.println(e.toString());
+    public List<BusDataAtMinute> getTimePeriodList(BusModel busModel) {
+        if (busDataAtMinuteLis == null) {
+            busDataAtMinuteLis = new ArrayList<>();
         }
-
-        busDataAtMinuteLis.add(new BusDataAtMinute(
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-                busModel.getCoordinates().getLongitude(),
-                busModel.getCoordinates().getLatitude(),
-                busService.getDistanceBetween(busModel.getCoordinates(), busStop.getCoordinates())
-        ));
+//        busDataAtMinuteLis.add(new BusDataAtMinute(
+//                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
+//                busModel.getCoordinates().getLongitude(),
+//                busModel.getCoordinates().getLatitude()
+//         ));
+        TaskMaker taskMaker = new TaskMaker(busModel);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(taskMaker, 0, 5, TimeUnit.SECONDS);
 
         return busDataAtMinuteLis;
     }
 
-    public Double generateBusDataForBusPredictionAPI() {
-        BusModel busModel = busService.getBusModels().get(0);
-        BusStop busStop = busStopService.getBusStops().get(0);
-//        System.out.println("bus(" + busModel.getTSCode() + ") and busStop(" + busStop.getName() + ") = " + busService.getDistanceBetween(busModel.getCoordinates(), busStop.getCoordinates()));
+    class TaskMaker extends TimeController implements Runnable {
+        private BusModel busModel;
 
-        return busService.getDistanceBetween(busModel.getCoordinates(), busStop.getCoordinates());
+        public TaskMaker(BusModel busModel) {
+            this.busModel = busModel;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (busDataAtMinuteLis.size() >= 10) {
+                    System.out.println("10");
+                    busDataAtMinuteLis.remove(0);
+                }
+            } catch (NullPointerException e) {
+                System.out.println(e.toString());
+            }
+            busDataAtMinuteLis.add(new BusDataAtMinute(
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
+                    busModel.getCoordinates().getLongitude(),
+                    busModel.getCoordinates().getLatitude()
+            ));
+        }
     }
 
-    public Queue<Double> getTenMinDistanceList(BusStop busStop, BusModel busModel) {
-        if (tenMinDistanceList.isEmpty()) {
-            tenMinDistanceList = new LinkedList<>();
-        }
-        if (tenMinDistanceList.size() >= 10) {
-            tenMinDistanceList.remove();
-        }
-        tenMinDistanceList.add(busService.getDistanceBetween(busModel.getCoordinates(), busStop.getCoordinates()));
 
-        Collections.reverse((List<?>) tenMinDistanceList);
-        return tenMinDistanceList;
-    }
-
-    //    public HashMap<String, Double> generateBusDataForBusPredictionAPI() {
-//
-//        HashMap<String, Double> generatedDistance = new HashMap<>();
-//        for (BusModel busModel : busService.getBusModels()) {
-//            for (BusStop busStop : busStopService.getBusStops()) {
-//                generatedDistance.put(busModel.getTSCode(), busService.getDistanceBetween(busModel.getCoordinates(), busStop.getCoordinates()));
-////                System.out.println("bus("+busModel.getTSCode()+") and busStop("+busStop.getName()+") = "+busService.getDistanceBetween(busModel.getCoordinates(),busStop.getCoordinates()));
-//            }
-//        }
-//        return generatedDistance;
-//    }
-//
-//    class Calculator implements Runnable {
-//        private List<BusDataAtMinute> busDataAtMinuteLis = null;
-//
-//        public Calculator() {
-//        }
-//
-//
-//        @Override
-//        public void run() {
-//
-//        }
-//
-////        public List<BusDataAtMinute> generate10MinList(BusStop busStop, BusModel busModel) {
-////
-////            try {
-////                if (busDataAtMinuteLis == null) {
-////                    busDataAtMinuteLis = new ArrayList<>();
-////                }
-////                if (busDataAtMinuteLis.size() >= 10) {
-////                    busDataAtMinuteLis.remove(busDataAtMinuteLis.size() - 1);
-////                }
-////            } catch (NullPointerException e) {
-////                System.out.println(e.toString());
-////            }
-////
-////            busDataAtMinuteLis.add(new BusDataAtMinute(
-////                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-////                    busModel.getCoordinates().getLongitude(),
-////                    busModel.getCoordinates().getLatitude(),
-////                    busService.getDistanceBetween(busModel.getCoordinates(), busStop.getCoordinates())
-////            ));
-////
-////            return busDataAtMinuteLis;
-////        }
-//    }
 }
