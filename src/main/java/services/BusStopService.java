@@ -1,7 +1,7 @@
 package services;
 
-import models.BusStop;
-import models.Coordinates;
+import models.BusStopModel;
+import models.CoordinatesModel;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class BusStopService {
     private final File file = new File("C:\\Users\\praktikant\\IdeaProjects\\bus-prediction\\src\\main\\java\\base\\bus-stop");
-    private final ArrayList<BusStop> busStops = new ArrayList<>();
+    private final ArrayList<BusStopModel> busStops = new ArrayList<>();
 
     //constructor
     public BusStopService() {
@@ -20,7 +20,7 @@ public class BusStopService {
     }
 
     //getter
-    public ArrayList<BusStop> getBusStops() {
+    public ArrayList<BusStopModel> getBusStops() {
         return busStops;
     }
 
@@ -32,9 +32,9 @@ public class BusStopService {
             for (int i = 0; i < arrayList.size(); i += 3) {
                 try {
                     busStops.add(
-                            new BusStop(
+                            new BusStopModel(
                                     arrayList.get(i).trim(),
-                                    new Coordinates(
+                                    new CoordinatesModel(
                                             Double.parseDouble(arrayList.get(i + 1).trim()),
                                             Double.parseDouble(arrayList.get(i + 2).trim())
                                     )));

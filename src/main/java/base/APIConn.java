@@ -106,7 +106,7 @@ public class APIConn {
         allBusDataJson = buses;
     }
 
-    public ArrayList<JsonObject> getBusesByLineCode(Integer lineCode) {
+    public ArrayList<JsonObject> getBusesByLineCode(Integer lineCode) {//work
         ArrayList<JsonObject> list = new ArrayList<>();
         if (allBusDataJson != null) {
             JsonArray array = allBusDataJson.getAsJsonArray("Activities");

@@ -1,19 +1,19 @@
 package example;
 
-import base.AIBusAPIConn;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import base.APIConn;
 
 public class Main {
     public static void main(String[] args) {
+//
+//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        scheduler.scheduleAtFixedRate(new Task(), 0, 30, TimeUnit.SECONDS);
+//
 
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(new Task(), 0, 30, TimeUnit.SECONDS);
+        APIConn apiConn=new APIConn();
+        System.out.println(apiConn.getBusesByLineCode(15));
+//
+//        AIBusAPIConn aiBusAPIConn=new AIBusAPIConn();
+//        aiBusAPIConn.getConnection();
 
-
-        AIBusAPIConn aiBusAPIConn=new AIBusAPIConn();
-        aiBusAPIConn.getConnection();
         }
     }

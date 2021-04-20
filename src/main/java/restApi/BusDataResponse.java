@@ -1,6 +1,6 @@
 package restApi;
 
-import models.SomeMinutesPeriodBusData;
+import models.AIBusDataModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,10 @@ public class BusDataResponse {
     private final Integer code;
 
     //get
-    private List<SomeMinutesPeriodBusData> allBusData = new ArrayList<>();
+    private List<AIBusDataModel> allBusData = new ArrayList<>();
 
     //get constructor
-    public BusDataResponse(String status, Integer code, List<SomeMinutesPeriodBusData> allBusData) {
+    public BusDataResponse(String status, Integer code, List<AIBusDataModel> allBusData) {
         this.status = status;
         this.code = code;
         this.allBusData = allBusData;
@@ -21,7 +21,7 @@ public class BusDataResponse {
 
 
     //getter
-    public List<SomeMinutesPeriodBusData> getAllBusData() {
+    public List<AIBusDataModel> getAllBusData() {
         return allBusData;
     }
 

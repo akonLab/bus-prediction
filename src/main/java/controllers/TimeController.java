@@ -1,101 +1,75 @@
 package controllers;
 
 import models.AIBusDataAtMinuteModel;
- import models.BusModel;
 import models.AIBusDataModel;
 import org.springframework.stereotype.Controller;
 import services.BusService;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 @Controller
-public class TimeController {
-    private BusService busService = new BusService();
-    private List<AIBusDataModel> allBusData = null;
-    private List<AIBusDataAtMinuteModel> busDataAtMinuteLis = null;
+public class TimeController implements Runnable {
+    private final BusService busService = new BusService();
+    private final List<AIBusDataModel> allBusData = new ArrayList<>();
+
+    private List<AIBusDataAtMinuteModel> busDataAtMinuteLis = new ArrayList<>();
+    String tscode = "A266";
 
     public TimeController() {
     }
 
-    public List<AIBusDataModel> getAllBusData() {
-        if (allBusData == null) {
-            allBusData = new ArrayList<>();
-        }
+    @Override
+    public void run() {
+        getPrevAIBusData();
+        addNewBusData();
+        writeData();
 
-//        ArrayList<BusModel> busModels = busService.getBusModels();
-//        for (BusModel busModel : busModels) {
-//            allBusData.add(new SomeMinutesPeriodBusData(
-//                    busModel.getTSCode(),
-//                    getTimePeriodList(busModel)
-//            ));
-//        }
-allBusData.addAll(busService.getMyBusModels());
-        allBusData.add(
-                new AIBusDataModel(
-                        busService.getBusModels().get(0).getTSCode(),
-                        getTimePeriodList(busService.getBusModels().get(0))
-                ));
-
-        return allBusData;
+        System.out.println();
     }
 
-    public List<AIBusDataAtMinuteModel> getTimePeriodList(BusModel busModel) {
+    void writeData() {
+        busService.saveAIBusModelToAIFile(allBusData);
+    }
 
-        if (busDataAtMinuteLis == null) {
-            busDataAtMinuteLis = new ArrayList<>();
+    boolean getPrevAIBusData() {
+        if (busService.getAIBusModelHashMapFromAIFile() != null) {
+            AIBusDataModel model = (Objects.requireNonNull(busService.getAIBusModelHashMapFromAIFile()).get(tscode));
+            allBusData.add(model);
+            System.out.println("prev bus data was added " + busService.getAIBusModelHashMapFromAIFile());
+            return true;
         }
+        return false;
+    }
+
+    //adding new data from not AI API
+    void addNewBusData() {
+        HashMap<String, AIBusDataAtMinuteModel> minArr = busService.getMinArr();
+        System.out.println("50"+minArr.get(0).toString());
+        System.out.println("add new bus data 2" + allBusData);
         try {
-            if (busDataAtMinuteLis.size() >= 10) {
-                busDataAtMinuteLis.remove(0);
-                System.out.println("10");
+            for (AIBusDataModel model : allBusData) {
+                if (model.getBusDataAtMinutes().size() >= 10) {
+                    model.getBusDataAtMinutes().remove(0);
+                }
+                model.getBusDataAtMinutes().add(
+                        minArr.get(model.getTsCode())
+                );
             }
         } catch (NullPointerException e) {
-            System.out.println(e.toString());
+            e.getCause();
         }
-//        busDataAtMinuteLis.add(
-//                new AIBusDataAtMinuteModel(
-//                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-//                        busModel.getDate(),
-//                        busModel.getCoordinates().getLongitude(),
-//                        busModel.getCoordinates().getLatitude()
-//                ));
 
-        return busDataAtMinuteLis;
+//        allBusData.get()
+//        allBusData.get(allBusData.indexOf())
+//        allBusData.addAll(busService.getBusModelsArrayList());
+        System.out.println("add new bus data 3" + allBusData);
     }
-//    public void start(){
-//                TaskMaker taskMaker = new TaskMaker(busModel);
-//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-//        scheduler.scheduleAtFixedRate(taskMaker, 0, 5, TimeUnit.SECONDS);
-//    }
-//
-//    class TaskMaker extends TimeController implements Runnable {
-//        private BusModel busModel;
-//
-//        public TaskMaker(BusModel busModel) {
-//            this.busModel = busModel;
-//        }
-//
-//        @Override
-//        public void run() {
-//            try {
-//                if (busDataAtMinuteLis.size() >= 10) {
-//                    busDataAtMinuteLis.remove(0);
-//                    System.out.println("10");
-//                }
-//            } catch (NullPointerException e) {
-//                System.out.println(e.toString());
-//            }
-//            busDataAtMinuteLis.add(
-//                    new BusDataAtMinute(
-//                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-//                            busModel.getDate(),
-//                            busModel.getCoordinates().getLongitude(),
-//                            busModel.getCoordinates().getLatitude()
-//                            ));
-//        }
-//    }
-//
+
+    public List<AIBusDataModel> getAllBusData() {
+        return allBusData;
+    }
 
 }

@@ -1,9 +1,12 @@
 package restApi;
 
 import controllers.TimeController;
-import models.SomeMinutesPeriodBusData;
-import org.springframework.web.bind.annotation.*;
+import models.AIBusDataModel;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -14,14 +17,19 @@ public class RestApiController {
     private static final int CODE_SUCCESS = 100;
     private static final int AUTH_FAILURE = 102;
 
-    private final TimeController timeController = new TimeController();
-    private List<SomeMinutesPeriodBusData> allBusData = null;
+//    private final TimeController timeController = new TimeController();
+    private List<AIBusDataModel> allBusData = new ArrayList<>();
 
     @GetMapping
     public BusDataResponse showAllBuses() {
-        if (allBusData == null) {
-            allBusData = timeController.getAllBusData();
-        }
+        TimeController timeController = new TimeController();
+
+//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        scheduler.scheduleAtFixedRate(timeController, 0, 5, TimeUnit.SECONDS);
+timeController.run();
+
+        allBusData = timeController.getAllBusData();
+
         return new BusDataResponse(SUCCESS_STATUS, CODE_SUCCESS, allBusData);
 
     }

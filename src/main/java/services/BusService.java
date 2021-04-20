@@ -1,100 +1,87 @@
 package services;
 
+import base.AIAPIFile;
 import base.APIConn;
-import base.AIBusAPIConn;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import models.AIBusDataAtMinuteModel;
-import models.BusModel;
-import models.CoordinatesModel;
 import models.AIBusDataModel;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class BusService {
     //old
     private final APIConn conn = new APIConn();
-    private ArrayList<BusModel> busModels;
-    private final HashMap<String, BusModel> busModelHashMap = new HashMap<>();
-    //new
-    private final AIBusAPIConn AIBusAPIConn = new AIBusAPIConn();
-    private ArrayList<AIBusDataModel> newBusModels;
-    private final HashMap<String, AIBusDataModel> newBusModelHashMap = new HashMap<>();
+    private ArrayList<AIBusDataModel> busModels;
+    private HashMap<String, AIBusDataAtMinuteModel> minArr = null;
+    private final HashMap<String, AIBusDataModel> busModelHashMap = new HashMap<>();
+    //from file
+    AIAPIFile aiapiFile = new AIAPIFile();
 
     public BusService() {
-        convertJsonDataIntoBusModelArray();
+        convertJsonDataIntoBusModelHashMap();
+        System.out.println("nusmodel hashmap size " + busModelHashMap.size());
     }
 
+
     //old
-    public ArrayList<BusModel> getBusModels() {
+    public ArrayList<AIBusDataModel> getBusModelsArrayList() {
         busModels = new ArrayList<>(busModelHashMap.values());
         return busModels;
     }
 
-    public void convertJsonDataIntoBusModelArray() {
-        for (JsonObject object : conn.getBusesByLineCode(15)) {//O(n)
-            busModelHashMap.put(
-                    object.get("TSCode").getAsString(),
-                    new BusModel(
-                            new CoordinatesModel(
-                                    object.get("Latitude").getAsDouble(),
-                                    object.get("Longitude").getAsDouble()),
-                            object.get("TSCode").getAsString(),
-                            object.get("RecordedTime").getAsString())
-            );
-        }
+    public HashMap<String, AIBusDataModel> getBusModelHashMap() {
+        return busModelHashMap;
     }
 
-    public BusModel getByTsCode(String TSCode) {
+    public HashMap<String, AIBusDataAtMinuteModel> getMinArr() {
+        return minArr;
+    }
+
+    public void convertJsonDataIntoBusModelHashMap() {
+        minArr = new HashMap<>();
+        System.out.println( conn.getBusesByLineCode(15).get(0).get("TSCode").getAsString());
+        minArr.put(
+                conn.getBusesByLineCode(15).get(0).get("TSCode").getAsString(),
+                new AIBusDataAtMinuteModel(
+                        conn.getBusesByLineCode(15).get(0).get("RecordedTime").getAsString(),
+                        conn.getBusesByLineCode(15).get(0).get("Longitude").getAsDouble(),
+                        conn.getBusesByLineCode(15).get(0).get("Latitude").getAsDouble()
+                ));
+
+//        for (JsonObject object : conn.getBusesByLineCode(15)) {//O(n)
+//            minArr.put(
+//                    object.get("TSCode").getAsString(),
+//                    new AIBusDataAtMinuteModel(
+//                            object.get("RecordedTime").getAsString(),
+//                            object.get("Longitude").getAsDouble(),
+//                            object.get("Latitude").getAsDouble()
+//                    ));
+//
+//        }
+        System.out.println("51" + minArr.get(0).toString());
+        System.out.println("converted hashmap");
+    }
+
+    List<AIBusDataAtMinuteModel> getList(JsonObject object, String code) {
+        return aiapiFile.getAIBusDataAtMinuteModelList(object, code);
+    }
+
+    public AIBusDataModel getByTsCode(String TSCode) {
         if (busModelHashMap.containsKey(TSCode)) {
             return busModelHashMap.get(TSCode);
         }
         return null;
     }
 
-    //new
-    public ArrayList<AIBusDataModel> getMyBusModels() {
-        newBusModels = new ArrayList<>(newBusModelHashMap.values());
-        return newBusModels;
+
+    //from file
+    public HashMap<String, AIBusDataModel> getAIBusModelHashMapFromAIFile() {
+        return aiapiFile.getAIBusModelHashMap();
     }
 
-    public void myconvertJsonDataIntoBusModelArray() {
-        for (JsonObject object : AIBusAPIConn.getBusDataArrayList()) {//O(n)
-            newBusModelHashMap.put(
-                    object.get("TSCode").getAsString(),
-                    new AIBusDataModel(
-                            object.get("TSCode").getAsString(),
-                            getBusDataAtMinArr(object, object.get("TSCode").getAsString())));
-        }
-    }
-
-    public List<AIBusDataAtMinuteModel> getBusDataAtMinArr(JsonObject object, String TSCode) {
-        ArrayList<AIBusDataAtMinuteModel> busDataAtMinutes = new ArrayList<>();
-
-        for (JsonElement jsonObject : object.getAsJsonArray()) {// loop for jsonArray("allBusData)
-            try {
-                if (jsonObject.getAsJsonObject().get("tsCode").getAsString().equals(TSCode)) {
-                    for (JsonElement arr : jsonObject.getAsJsonObject().get("busDataAtMinutes").getAsJsonArray()) {// loop for jsonArray("busDataAtMinutes)
-                        busDataAtMinutes.add(
-                                new AIBusDataAtMinuteModel(
-                                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-                                        arr.getAsJsonObject().get("RecordedTime").getAsString(),
-                                        arr.getAsJsonObject().get("Longitude").getAsDouble(),
-                                        arr.getAsJsonObject().get("Latitude").getAsDouble()
-                                ));
-                    }
-                }
-            } catch (NumberFormatException exception) {
-                exception.getCause();
-            }
-        }
-
-        return busDataAtMinutes;
-    }
-
-    public HashMap<String, AIBusDataModel> getNewBusModelHashMap() {
-        return newBusModelHashMap;
+    public void saveAIBusModelToAIFile(List<AIBusDataModel> list) {
+        aiapiFile.rewriteAIFile(list);
     }
 }

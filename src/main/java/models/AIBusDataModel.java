@@ -18,7 +18,7 @@ public class AIBusDataModel {
         return TsCode;
     }
 
-    public List<BusDataAtMinute> getBusDataAtMinutes() {
+    public List<AIBusDataAtMinuteModel> getBusDataAtMinutes() {
         return busDataAtMinutes;
     }
 }

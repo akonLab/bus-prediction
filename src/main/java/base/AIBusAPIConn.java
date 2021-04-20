@@ -16,53 +16,52 @@ public class AIBusAPIConn {
     private JsonObject allBusDataJson;
 
     public AIBusAPIConn() {
+
         getAllBusData();
     }
 
-    public void getConnection() {
-
+    public Boolean getConnection() {
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(host).openConnection();
-
-            conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestMethod("GET");
-            if (conn.getResponseCode() != 200) {
-                isRunning = false;
+            conn.connect();
+            if (conn.getResponseCode() == 200) {
+                return true;
             }
-            System.out.println(conn.getResponseCode());
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
-
+        return false;
     }
 
     public void getAllBusData() {
         JsonObject buses = null;
+
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(host).openConnection();
-
-            conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestMethod("GET");
+            conn.setRequestProperty("Content-Type", "application/json");
 
-            if (conn.getResponseCode() != 200) {
-                isRunning = false;
+            conn.setUseCaches(false);
+            conn.setDoOutput(true);
+            conn.connect();
+
+            InputStream is = conn.getInputStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
+            String line;
+            while ((line = rd.readLine()) != null) {
+                response.append(line).append("\n");
+                response.append('\r');
             }
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String output;
-
-            StringBuilder response = new StringBuilder();
-            while ((output = in.readLine()) != null) {
-                response.append(output);
-            }
-
-            in.close();
+            rd.close();
 
             JsonParser parser = new JsonParser();
             buses = (JsonObject) parser.parse(response.toString());
-
         } catch (IOException e) {
             System.out.println(e.getCause().toString());
+        } catch (NullPointerException exception) {
+            exception.getCause();
         }
         allBusDataJson = buses;
     }
@@ -84,6 +83,7 @@ public class AIBusAPIConn {
         } else {
             System.out.println("nope, json is empty");
         }
+        System.out.println("88 AI Api " + list.size());
         return list;
     }
 
