@@ -11,15 +11,14 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class APIConn {
-    //Авторизация POST //Body x-www-form-urlencoded
-    private static final String authHost = "https://lrtportal.transcard.kz/tsm/Token";
-
-    //Онлайн передвижение автобусов GET
-    private static final String busHost = "https://lrtportal.transcard.kz/tsm/api/buses/states";
+    private static final String authHost = "https://lrtportal.transcard.kz/tsm/Token"; //Авторизация POST //Body x-www-form-urlencoded
+    private static final String busHost = "https://lrtportal.transcard.kz/tsm/api/buses/states";  //Онлайн передвижение автобусов GET
     private String token;
+    private JsonObject allBusDataJson;
 
     public APIConn() {
         token = generateToken();
+        getAllBusData();
     }
 
     public String getToken() {
@@ -72,7 +71,7 @@ public class APIConn {
         return null;
     }
 
-    public JsonObject showBusData() {
+    public void getAllBusData() {
         JsonObject buses = null;
         try {
             HttpURLConnection conn = (HttpURLConnection) new URL(busHost).openConnection();
@@ -83,7 +82,7 @@ public class APIConn {
 
             if (conn.getResponseCode() == 401) {
                 token = generateToken().replace('"', ' ').trim();
-                showBusData();
+                getAllBusData();
             }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -104,18 +103,17 @@ public class APIConn {
         } catch (IOException e) {
             System.out.println(e.getCause().toString());
         }
-        return buses;
-
+        allBusDataJson = buses;
     }
 
-    public ArrayList<JsonObject> sort(JsonObject json) {
+    public ArrayList<JsonObject> getBusesByLineCode(Integer lineCode) {
         ArrayList<JsonObject> list = new ArrayList<>();
-        if (json != null) {
-            JsonArray array = json.getAsJsonArray("Activities");
+        if (allBusDataJson != null) {
+            JsonArray array = allBusDataJson.getAsJsonArray("Activities");
 
             for (JsonElement jsonObject : array) {
                 try {
-                    if (jsonObject.getAsJsonObject().get("LineCode").getAsInt() == 15) {
+                    if (jsonObject.getAsJsonObject().get("LineCode").getAsInt() == lineCode) {
                         list.add(jsonObject.getAsJsonObject());
                     }
                 } catch (NumberFormatException exception) {
@@ -127,5 +125,6 @@ public class APIConn {
         }
         return list;
     }
+
 }
 

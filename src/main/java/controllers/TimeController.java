@@ -1,96 +1,101 @@
 package controllers;
 
-
-import example.Task;
-import models.BusDataAtMinute;
-import models.BusModel;
-import models.BusStop;
-import models.SomeMinutesPeriodBusData;
+import models.AIBusDataAtMinuteModel;
+ import models.BusModel;
+import models.AIBusDataModel;
+import org.springframework.stereotype.Controller;
 import services.BusService;
-import services.BusStopService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
+@Controller
 public class TimeController {
     private BusService busService = new BusService();
-    private List<SomeMinutesPeriodBusData> allBusData = null;
-    private List<BusDataAtMinute> busDataAtMinuteLis = null;
+    private List<AIBusDataModel> allBusData = null;
+    private List<AIBusDataAtMinuteModel> busDataAtMinuteLis = null;
 
     public TimeController() {
     }
 
-
-    public List<SomeMinutesPeriodBusData> getAllBusData() {
+    public List<AIBusDataModel> getAllBusData() {
         if (allBusData == null) {
             allBusData = new ArrayList<>();
         }
 
-//        ArrayList<BusModel> busModels=busService.getBusModels();
+//        ArrayList<BusModel> busModels = busService.getBusModels();
 //        for (BusModel busModel : busModels) {
-////            if (allBusData.contains(busModel)){
-////
-////            }
 //            allBusData.add(new SomeMinutesPeriodBusData(
 //                    busModel.getTSCode(),
-//                    getTimePeriodList(  busModel)
+//                    getTimePeriodList(busModel)
 //            ));
-//
 //        }
-        busService = new BusService();
+allBusData.addAll(busService.getMyBusModels());
         allBusData.add(
-                new SomeMinutesPeriodBusData(
-                busService.getBusModels().get(0).getTSCode(),
-                getTimePeriodList(busService.getBusModels().get(0))
-        ));
+                new AIBusDataModel(
+                        busService.getBusModels().get(0).getTSCode(),
+                        getTimePeriodList(busService.getBusModels().get(0))
+                ));
 
         return allBusData;
     }
 
-    public List<BusDataAtMinute> getTimePeriodList(BusModel busModel) {
+    public List<AIBusDataAtMinuteModel> getTimePeriodList(BusModel busModel) {
+
         if (busDataAtMinuteLis == null) {
             busDataAtMinuteLis = new ArrayList<>();
         }
-//        busDataAtMinuteLis.add(new BusDataAtMinute(
-//                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-//                busModel.getCoordinates().getLongitude(),
-//                busModel.getCoordinates().getLatitude()
-//         ));
-        TaskMaker taskMaker = new TaskMaker(busModel);
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(taskMaker, 0, 5, TimeUnit.SECONDS);
+        try {
+            if (busDataAtMinuteLis.size() >= 10) {
+                busDataAtMinuteLis.remove(0);
+                System.out.println("10");
+            }
+        } catch (NullPointerException e) {
+            System.out.println(e.toString());
+        }
+//        busDataAtMinuteLis.add(
+//                new AIBusDataAtMinuteModel(
+//                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
+//                        busModel.getDate(),
+//                        busModel.getCoordinates().getLongitude(),
+//                        busModel.getCoordinates().getLatitude()
+//                ));
 
         return busDataAtMinuteLis;
     }
-
-    class TaskMaker extends TimeController implements Runnable {
-        private BusModel busModel;
-
-        public TaskMaker(BusModel busModel) {
-            this.busModel = busModel;
-        }
-
-        @Override
-        public void run() {
-            try {
-                if (busDataAtMinuteLis.size() >= 10) {
-                    System.out.println("10");
-                    busDataAtMinuteLis.remove(0);
-                }
-            } catch (NullPointerException e) {
-                System.out.println(e.toString());
-            }
-            busDataAtMinuteLis.add(new BusDataAtMinute(
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
-                    busModel.getCoordinates().getLongitude(),
-                    busModel.getCoordinates().getLatitude()
-            ));
-        }
-    }
-
+//    public void start(){
+//                TaskMaker taskMaker = new TaskMaker(busModel);
+//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+//        scheduler.scheduleAtFixedRate(taskMaker, 0, 5, TimeUnit.SECONDS);
+//    }
+//
+//    class TaskMaker extends TimeController implements Runnable {
+//        private BusModel busModel;
+//
+//        public TaskMaker(BusModel busModel) {
+//            this.busModel = busModel;
+//        }
+//
+//        @Override
+//        public void run() {
+//            try {
+//                if (busDataAtMinuteLis.size() >= 10) {
+//                    busDataAtMinuteLis.remove(0);
+//                    System.out.println("10");
+//                }
+//            } catch (NullPointerException e) {
+//                System.out.println(e.toString());
+//            }
+//            busDataAtMinuteLis.add(
+//                    new BusDataAtMinute(
+//                            LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss")),
+//                            busModel.getDate(),
+//                            busModel.getCoordinates().getLongitude(),
+//                            busModel.getCoordinates().getLatitude()
+//                            ));
+//        }
+//    }
+//
 
 }

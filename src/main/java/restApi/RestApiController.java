@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/get10min")
+@RequestMapping("/buses")
 public class RestApiController {
     private static final String SUCCESS_STATUS = "success";
     private static final String ERROR_STATUS = "error";
@@ -15,12 +15,12 @@ public class RestApiController {
     private static final int AUTH_FAILURE = 102;
 
     private final TimeController timeController = new TimeController();
-    private List<SomeMinutesPeriodBusData> allBusData=null;
+    private List<SomeMinutesPeriodBusData> allBusData = null;
+
     @GetMapping
     public BusDataResponse showAllBuses() {
-        if (allBusData==null){
-            allBusData=timeController.getAllBusData();
-
+        if (allBusData == null) {
+            allBusData = timeController.getAllBusData();
         }
         return new BusDataResponse(SUCCESS_STATUS, CODE_SUCCESS, allBusData);
 

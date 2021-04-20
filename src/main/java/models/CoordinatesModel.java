@@ -1,14 +1,14 @@
 package models;
 
 
-public class Coordinates {
+public class CoordinatesModel {
     private Double Longitude;
     private Double Latitude;
 
-    public Coordinates() {
+    public CoordinatesModel() {
     }
 
-    public Coordinates(Double latitude, Double longitude) {
+    public CoordinatesModel(Double latitude, Double longitude) {
         Longitude = longitude;
         Latitude = latitude;
     }

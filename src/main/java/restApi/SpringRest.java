@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration.class})
 @SpringBootApplication
@@ -13,8 +14,8 @@ public class SpringRest {
         SpringApplication.run(SpringRest.class);
     }
 
-    @Scheduled(fixedRate = 30000)
-    @GetMapping(value="/get10min")
+    @Scheduled(fixedRate = 5000)
+    @RequestMapping("/buses")
     public void greeting() {
         System.out.println("Hello!!!");
     }

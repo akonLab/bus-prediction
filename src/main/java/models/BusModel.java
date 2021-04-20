@@ -1,21 +1,32 @@
 package models;
 
 public class BusModel {
-    private Coordinates coordinates;
+    private CoordinatesModel coordinates;
     private String TSCode;
+    private String date;
 
     //constructor
     public BusModel() {
 
     }
 
-    public BusModel(Coordinates coordinates, String TSCode) {
+    public BusModel(CoordinatesModel coordinates, String TSCode) {
         this.coordinates = coordinates;
         this.TSCode = TSCode;
     }
 
+    public BusModel(CoordinatesModel coordinates, String TSCode, String date) {
+        this.coordinates = coordinates;
+        this.TSCode = TSCode;
+        this.date = date;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
     //getter
-    public Coordinates getCoordinates() {
+    public CoordinatesModel getCoordinates() {
         return coordinates;
     }
 
