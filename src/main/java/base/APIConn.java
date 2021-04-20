@@ -21,10 +21,6 @@ public class APIConn {
         getAllBusData();
     }
 
-    public String getToken() {
-        return token;
-    }
-
     public String generateToken() {
         HttpURLConnection connection = null;
         String urlParameters = "username=astinn" +
@@ -79,11 +75,11 @@ public class APIConn {
             conn.setRequestProperty("Authorization", "Bearer " + token);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestMethod("GET");
-
-            if (conn.getResponseCode() == 401) {
-                token = generateToken().replace('"', ' ').trim();
-                getAllBusData();
-            }
+//
+//            if (conn.getResponseCode() == 401) {
+//                token = generateToken().replace('"', ' ').trim();
+//                getAllBusData();
+//            }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 

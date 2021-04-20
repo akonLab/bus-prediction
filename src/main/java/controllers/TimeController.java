@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import services.BusService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,37 +33,32 @@ public class TimeController implements Runnable {
         busService.saveAIBusModelToAIFile(allBusData);
     }
 
-    boolean getPrevAIBusData() {
+    void getPrevAIBusData() {
         if (busService.getAIBusModelHashMapFromAIFile() != null) {
             AIBusDataModel model = (Objects.requireNonNull(busService.getAIBusModelHashMapFromAIFile()).get(tscode));
             allBusData.add(model);
             System.out.println("prev bus data was added " + busService.getAIBusModelHashMapFromAIFile());
-            return true;
         }
-        return false;
     }
 
     //adding new data from not AI API
     void addNewBusData() {
-        HashMap<String, AIBusDataAtMinuteModel> minArr = busService.getMinArr();
-        System.out.println("50"+minArr.get(0).toString());
-        System.out.println("add new bus data 2" + allBusData);
+//        HashMap<String, AIBusDataAtMinuteModel> minArr = busService.getMinArr();
+//        System.out.println("50"+minArr.get(0).toString());
+        System.out.println("add new bus data 2" + busService.getMinElem());
         try {
             for (AIBusDataModel model : allBusData) {
                 if (model.getBusDataAtMinutes().size() >= 10) {
                     model.getBusDataAtMinutes().remove(0);
                 }
                 model.getBusDataAtMinutes().add(
-                        minArr.get(model.getTsCode())
+//                        minArr.get(model.getTsCode())
+                        busService.getMinElem()
                 );
             }
         } catch (NullPointerException e) {
             e.getCause();
         }
-
-//        allBusData.get()
-//        allBusData.get(allBusData.indexOf())
-//        allBusData.addAll(busService.getBusModelsArrayList());
         System.out.println("add new bus data 3" + allBusData);
     }
 

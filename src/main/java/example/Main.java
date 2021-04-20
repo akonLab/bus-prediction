@@ -10,7 +10,7 @@ public class Main {
 //
 
         APIConn apiConn=new APIConn();
-        System.out.println(apiConn.getBusesByLineCode(15));
+        System.out.println(apiConn.generateToken());
 //
 //        AIBusAPIConn aiBusAPIConn=new AIBusAPIConn();
 //        aiBusAPIConn.getConnection();

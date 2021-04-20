@@ -1,11 +1,10 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AIBusDataModel {
     private final String TsCode;
-    private List<AIBusDataAtMinuteModel> busDataAtMinutes = new ArrayList<>();
+    private final List<AIBusDataAtMinuteModel> busDataAtMinutes ;
 
     //constructor
     public AIBusDataModel(String tsCode, List<AIBusDataAtMinuteModel> newBusDataAtMinutes) {
